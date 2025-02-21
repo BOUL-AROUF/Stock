@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bon de Livraison</title>
+    <style>
+        table {
+            position: relative;
+            height: 100%;
+            width: 100%;
+            border-collapse: collapse;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            margin: 10px auto;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        tbody tr:nth-of-type(even) {
+            background-color: #f3f3f3;
+        }
+
+        /* Style for select dropdown */
+        select {
+            padding: 8px;
+            font-size: 14px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            width: 100%;
+            background-color: #f9f9f9;
+            color: #333;
+            cursor: pointer;
+        }
+        select:focus {
+            outline: none;
+            border-color: #4CAF50;
+            background-color: #eaf2e0;
+        }
+        option {
+            padding: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h2 id="store-name"></h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Serie</th>
+                <th>Produit</th>
+                <th>Quantité</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="orders-list">
+
+        </tbody>
+    </table>
+    <button id="generate">Generate</button>
+
+    <script>
+       const { ipcRenderer } = require('electron');
+       let storname;
+    // Receive the store name and orders (without date), then display them
+    ipcRenderer.on('store-data', (event, data) => {
+        const { store, orders } = data;
+        storname = store;
+        // Display the store name
+        document.getElementById('store-name').textContent = `Store: ${store}`;
+    
+        // Populate orders table without the date
+        const ordersTable = document.getElementById('orders-list');
+        ordersTable.innerHTML = '';  // Clear any previous content
+    
+        orders.forEach(order => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${order.serie}</td>
+                <td>${order.produit}</td>
+                <td><input type="text" class="Qte" value="${order.quantite}" id="quantite"></td>
+                <td>
+                    <select name="Status" class="status-select">
+                        <option>Stock in</option>
+                        <option>Stock out</option>
+                    </select>
+                </td>
+            `;
+            ordersTable.appendChild(row);
+        });
+    });
+
+    // Function to save the table data to localStorage
+    function saveToLocalStorage() {
+        const ordersData = [];
+        const store = [];
+        const rows = document.querySelectorAll('#orders-list tr');
+        
+        rows.forEach(row => {
+            const serie = row.cells[0].textContent;
+            const produit = row.cells[1].textContent;
+            const quantite = row.querySelector('.Qte').value; 
+            const status = row.querySelector('.status-select').value;
+            
+            ordersData.push({ serie, produit, quantite, status });
+        });
+
+        store.push({storname});
+        // Save the orders data to localStorage
+        localStorage.setItem('ordersData', JSON.stringify(ordersData));
+        localStorage.setItem('store',JSON.stringify(store));
+
+        alert('Data saved to localStorage!');
+    }
+
+    // Add event listener for the "Generate" button
+    document.getElementById('generate').onclick = function() {
+        
+        saveToLocalStorage()
+        ipcRenderer.send('open-inv-window');
+    };
+
+    </script>
+</body>
+</html>

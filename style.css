@@ -1,0 +1,295 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: whitesmoke;
+}
+
+header {
+    position: fixed;
+    height: 100%;
+    width: 15%;
+    left: 0;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 
+    'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    background-color: white;
+}
+
+.logo {
+    position: absolute;
+    top: 2rem;
+}
+
+.menu {
+    position: absolute;
+    top: 8rem;
+}
+ul {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+li {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.3rem;
+    cursor: pointer;
+    padding:0.3rem;
+    width: 10rem;
+    border-radius: 20px;
+    justify-content: center;
+    height: 2.5rem;
+    font-size: 1.3rem;
+}
+li:hover{
+    background-color: rgb(171, 171, 255);
+}
+.active{
+    background-color: rgb(171, 171, 255);
+}
+li img {
+    height: 30px;
+}
+.container {
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 
+    'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+.head {
+    position: sticky;
+    display: flex;
+    flex-direction: row;
+    height: 70px;
+    width: 100%;
+    background-color: white;
+    justify-content: space-around;
+    align-items: center;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    top: 0;
+    left: 20rem;
+    width: 80%;
+    z-index: 99;
+    border-bottom: 1.5px solid gray;
+}
+.exit {
+    background-color: rgb(199, 198, 198);
+    height: 3REM;
+    width: 3rem;
+    border-radius: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 25px;
+    cursor: pointer;
+    color: rgb(197, 5, 5);
+}
+
+.Date-time {
+    position: relative;
+    display: flex;
+    justify-content: space-around;
+    width: 30%;
+    top: 2rem;
+    left: 45rem;
+    background-color: white;
+    padding: 0.5rem;
+    color: rgb(83, 83, 250);
+    border-radius: 20px;
+}
+
+.tables {
+    position: relative;
+    top: 5rem;
+    left: 20rem;
+    background-color: white;
+    width: 76%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 2rem;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.ste .store-name {
+    text-align: start;
+    background-color: #b3c9f1;
+}
+.ste tbody td {
+    padding: 10px; 
+}
+
+.ste {
+    margin: 1rem;
+    width: 100%;  
+    text-align: center;
+    border-collapse: collapse;  
+}
+
+.ste th, .ste td {
+    padding: 8px;  
+    border: 1px solid #ddd; 
+    text-align: center;
+}
+
+.ste thead {
+    background-color: #8EA9DB;
+    color: white;
+}
+
+.ste tbody {
+    text-align: center;
+}
+.ste tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3;
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 0.3rem;
+}
+
+.date-filter {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    width: 70%;
+    height: 15%;
+    top: 3rem;
+    left: 25rem;
+    background-color: white;
+    padding: 1rem;
+    color: rgb(83, 83, 250);
+    border-radius: 20px;
+}
+
+.date-filter label {
+    margin-right: 1rem;
+}
+
+.date-filter input {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#bonbtn {
+    background-color: #4CAF50;
+    color: white;
+    height: 2rem;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+#bonbtn:hover {
+    background-color: #3d8b3f;
+
+}
+
+.bon-container {
+    position: relative;
+    width: 21cm;
+    height: 29.7cm;
+    left: 2.5rem;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 
+    'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+.dive1 {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.mini-div h3 {
+    border: 2.5px solid rgb(101, 101, 255);
+    text-align: center;
+}
+
+.mini-mini {
+    border: 1.5px solid gray;
+    text-align: center;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+.dive2 {
+    position: absolute;
+    width: 90%;
+    left: 1.8rem;
+    top: 18.5rem;
+}
+.dive3 {
+    position: absolute;
+    margin: auto;
+    font-size: 12px;
+    font-weight: bold;
+    width: 100%;
+    text-align: center;
+    text-decoration: underline;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 
+    'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+#upload {
+    position: relative;
+    background-color: #4CAF50;
+    color: white;
+    height: 3rem;
+    width: 7rem;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    margin: 1.5rem 2rem;
+}
+
+#upload:hover {
+    background-color: #3d8b3f;
+}
+
+@media only screen and (max-width: 425px) {
+    body {
+      background-color: lightblue;
+      margin: 0;
+      padding: 0;
+    }
+  
+    header {
+        position: fixed;
+        width: 100%;
+        height: 5rem;
+        top: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-around;
+        color: white;
+        z-index: 999;
+    }
+    
+    #left {
+        background-color: rgb(177, 174, 174);
+        height: 2.5rem;
+        width: 2.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        color: white;
+        font-size: 18px;
+        border-radius: 100%;
+    }
+  }

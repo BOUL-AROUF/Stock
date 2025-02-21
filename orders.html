@@ -1,0 +1,211 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
+    <script src="https://kit.fontawesome.com/7ce4c17c5c.js" crossorigin="anonymous"></script>
+    <link rel="shortcut icon" href="/logo.png" type="image/x-icon">
+    <title>Dashboard</title>
+    <style>
+
+    </style>
+</head>
+<body>
+    <header>
+        <img src="./Untitled-1-01.png" alt="Image" class="logo">
+        <div class="menu">
+            <ul>
+                <li id="dash">
+                    Dashboard
+                </li>
+                <li id="ord" class="active">
+                    Orders
+                </li>
+                <li id="inv">
+                    Invoices
+                </li>
+            </ul>
+        </div>
+    </header>
+    <div class="container">
+        <div class="head">
+            <h2>BIO ZAGORA STOCK TRACKER</h2>
+            <span class="exit" id="logout-btn"><i class="fa-solid fa-door-open"></i></span>
+        </div>
+
+        <!-- Date filter -->
+        <div class="date-filter">
+            <label for="filter-date">Filter: </label>
+            <input type="date" id="filter-date" name="filter-date">
+        </div>
+    
+        <div class="tables">
+            <!-- Orders tables will be populated here -->
+        </div>
+    </div>
+    <script>
+            let Dash = document.getElementById('dash');
+            let inv = document.getElementById('inv');
+
+            inv.onclick = function() {
+                window.location.href = 'invoices.html';
+            }
+            Dash.onclick = function() {
+                window.location.href = 'Dashboard.html';
+            }
+        // Function to load orders with better debugging
+        function loadOrders(filterDate = '') {
+            const ordersContainer = document.querySelector('.tables');
+            ordersContainer.innerHTML = '<div class="loading">Loading orders...</div>';
+        
+            // Log the date being sent
+            console.log('Fetching orders for date:', filterDate);
+        
+            const url = filterDate 
+                ? `http://localhost:3000/get-orders-2?date=${encodeURIComponent(filterDate)}` 
+                : 'http://localhost:3000/get-orders-2';
+        
+            // Log the full URL being fetched
+            console.log('Fetching URL:', url);
+        
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Log the received data
+                    console.log('Received data:', data);
+                
+                    if (data.success) {
+                        ordersContainer.innerHTML = '';
+
+                        const stores = ['Rabat', 'Tanger', 'Salé', 'Kénitra', 'Laayoune'];
+
+                        stores.forEach(store => {
+                            const storeOrders = data.orders[store] || [];
+                            if (storeOrders.length > 0) {
+                                // Create store table structure
+                                const storeTable = document.createElement('table');
+                                storeTable.className = 'ste';
+                                storeTable.innerHTML = `
+                                    <thead>
+                                        <tr>
+                                        <th class="store-name">${store}</th>
+                                        <th style="border: none; background-color: white;"><button id="bonbtn">Generate Bon de Livraison ${store}</button></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <table class="orders-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Serie</th>
+                                                    <th>Produit</th>
+                                                    <th>Quantité</th>
+                                                    <th>Date</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class ="orders" id="orders-${store}"></tbody>
+                                        </table>
+                                    </tbody>
+                                `;
+                                
+                                ordersContainer.appendChild(storeTable);
+                                
+                                // Populate orders for this store
+                                const ordersBody = document.getElementById(`orders-${store}`);
+                                data.orders[store].forEach(order => {
+                                    const row = document.createElement('tr');
+                                    row.innerHTML = `
+                                        <td>${order.serie}</td>
+                                        <td>${order.produit}</td>
+                                        <td>${order.quantite}</td>
+                                        <td>${order.date}</td>
+                                    `;
+                                    ordersBody.appendChild(row);
+                                });
+                            }
+                        });
+                    
+                        if (ordersContainer.children.length === 0) {
+                            ordersContainer.innerHTML = '<div class="no-orders">No orders found for the selected date</div>';
+                        }
+                    } else {
+                        console.error('Failed to fetch orders:', data.message);
+                        ordersContainer.innerHTML = '<div class="error">Failed to load orders</div>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching orders:', error);
+                    ordersContainer.innerHTML = '<div class="error">Error loading orders: ' + error.message + '</div>';
+                });
+        }
+
+        // Make sure the date filter is properly initialized and handled
+        document.addEventListener('DOMContentLoaded', () => {
+            const filterDateInput = document.getElementById('filter-date');
+
+            // Set default date to today
+            const today = new Date().toISOString().split('T')[0];
+            filterDateInput.value = today;
+
+            // Load initial orders
+            loadOrders(today);
+        
+            // Add event listener with debug logging
+            filterDateInput.addEventListener('change', (event) => {
+                const selectedDate = event.target.value;
+                console.log('Date selected:', selectedDate);
+                loadOrders(selectedDate);
+            });
+        });
+    
+        // Logout functionality
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            try {
+                const response = await fetch('http://localhost:3000/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'same-origin',  // Keep session intact if needed
+                });
+    
+                const data = await response.json();
+    
+                if (response.ok) {
+                    // Redirect to login page after successful logout
+                    window.location.href = 'index.html';  // Change to your login page
+                } else {
+                    console.error('Logout failed:', data.error);
+                }
+            } catch (error) {
+                console.error('Error logging out:', error);
+            }
+        });
+    
+        const { ipcRenderer } = require('electron');
+
+        // Send the store orders (without date) to the 'bon.html' window when the button is clicked
+        document.addEventListener('click', (event) => {
+            if (event.target && event.target.id === 'bonbtn') {
+                const store = event.target.closest('table').querySelector('.store-name').textContent.trim();
+                const orders = Array.from(event.target.closest('table').querySelectorAll('.ste tbody tr')).map(row => {
+                    return {
+                        serie: row.cells[0].textContent,
+                        produit: row.cells[1].textContent,
+                        quantite: row.cells[2].textContent,
+                        // Exclude the date property
+                    };
+                });
+            
+                // Send both store name and orders (without the date) to the main process
+                ipcRenderer.send('open-bon-window', { store, orders });
+            }
+        });
+
+    </script>
+</body>
+</html>

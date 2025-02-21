@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>    
+    <title>Invoice Generator</title>
+    <style>
+        body {
+            background-color: white;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .bon-container {
+            position: relative;
+            width: 21cm;
+            height: 29.7cm;
+            left: 2.5rem;
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 
+            'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            background: white;
+            box-sizing: border-box;
+        }
+
+        .dive1 {
+            position: absolute;
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            justify-content: space-around;
+            align-items: center;
+            top: 2rem; /* Added top padding */
+        }
+
+        .dive1 img {
+            height: 5rem;
+        }
+
+        .mini-div {
+            width: 60%; /* Increased width */
+            padding: 0.5rem; /* Added padding */
+        }
+
+        .mini-div h3 {
+            border: 2.5px solid rgb(101, 101, 255);
+            text-align: center;
+            margin: 0 0 15px 0; /* Increased bottom margin */
+            padding: 12px; /* Increased padding */
+            font-size: 1.2rem; /* Slightly larger font */
+        }
+
+        .mini-mini {
+            border: 1.5px solid gray;
+            text-align: center;
+            padding: 1rem 1.5rem; /* Increased padding */
+            margin-top: 1rem; /* Added top margin */
+        }
+
+        .mini-mini p {
+            margin: 8px 0; /* Increased margin */
+            font-size: 13px; /* Slightly larger font */
+            line-height: 1.4; /* Added line height */
+        }
+
+        /* Rest of the styles remain the same */
+        .dive2 {
+            position: absolute;
+            width: 90%;
+            left: 1.8rem;
+            top: 18.5rem;
+        }
+
+        table {
+            margin-top: 3rem;
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        th {
+            background-color: rgb(101, 101, 255);
+            color: white;
+            padding: 6px;
+            font-weight: normal;
+            text-align: center;
+        }
+
+        td {
+            padding: 6px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        tbody tr:nth-of-type(even) {
+            background-color: #f3f3f3;
+        }
+
+        .dive3 {
+            position: absolute;
+            margin: auto;
+            font-size: 12px;
+            font-weight: bold;
+            width: 100%;
+            text-align: center;
+            text-decoration: underline;
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 
+            'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            bottom: 2rem;
+        }
+
+        #Upload {
+            padding: 10px 20px;
+            background-color: rgb(101, 101, 255);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .page-container {
+            position: relative;
+            width: 21cm;
+            height: 29.7cm;
+            background: white;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <button id="Upload">Generate PDF</button>
+
+    <script>
+        // Function to get the current date and time
+        function getCurrentDateTime() {
+            const now = new Date();
+            const day = String(now.getDate()).padStart(2, "0");
+            const month = String(now.getMonth() + 1).padStart(2, "0");
+            const year = now.getFullYear();
+            const hours = String(now.getHours()).padStart(2, "0");
+            const minutes = String(now.getMinutes()).padStart(2, "0");
+            const seconds = String(now.getSeconds()).padStart(2, "0");
+            return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+        }
+
+        // Function to generate bon number
+        function generateBonNumber() {
+            return Math.floor(100000 + Math.random() * 900000);
+        }
+
+        // Store details object
+        const storeDetails = {
+            "Rabat": { name: "Nakhelat benhada", ice: "000192328000039", address: "55 AV OULD OUMIER AGDAL, RABAT", phone: "0537682366" },
+            "Tanger": { name: "ZAGORA HERBES VIP SARL", ice: "001899662000010", address: "N°86, Rue Mohammed V, à côté de la Place des Nations, Tanger", phone: "0539941789" },
+            "Kénitra": { name: "Nakhelat benhada", ice: "000192328000039", address: "Bloc D N°36, Maghreb El-Arabi, Double voie, Ouled Wagih, Kenitra", phone: "05373584727" },
+            "Laayoune": { name: "AGAMAN BIO", ice: "003523816000097", address: "Rue Al-Samara, en face de Marjan Al-Oyoun", phone: "0528997426" },
+            "Default": { name: "Nakhelat benhada", ice: "000192328000039", address: "N°36, rue Lalla Asmaa Tabrikt, Salé", phone: "0664133512" }
+        };
+
+        // Helper function to create header
+        function createHeader(storeName, bonNumber, bonDate) {
+            const storeDetail = storeDetails[storeName] || storeDetails["Default"];
+            const header = document.createElement('div');
+            header.classList.add('dive1');
+            header.innerHTML = `
+                <img src="./Untitled-1-01.png" alt="">
+                <div class="mini-div">
+                    <h3>BON DE LIVRAISON</h3>
+                    <p>N° : ${bonNumber}</p>
+                    <p>DATE : Le ${bonDate}</p>
+                    <div class="mini-mini">
+                        <p>${storeDetail.name}</p>
+                        <p>ICE : ${storeDetail.ice}</p>
+                        <p>${storeDetail.address}</p>
+                        <p>${storeDetail.phone}</p>
+                    </div>
+                </div>
+            `;
+            return header;
+        }
+
+        // Helper function to create table
+        function createTable(pageData) {
+            const table = document.createElement('table');
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>Serie</th>
+                        <th>Produit</th>
+                        <th>Quantité</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${pageData.map(order => `
+                        <tr>
+                            <td>${order.serie}</td>
+                            <td>${order.produit}</td>
+                            <td>${order.quantite}</td>
+                            <td>${order.status}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            `;
+            return table;
+        }
+
+        // Main function to generate PDF
+        async function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            const store = JSON.parse(localStorage.getItem('store')) || [];
+            const ordersData = JSON.parse(localStorage.getItem('ordersData')) || [];
+            const maxRowsPerPage = 24;
+            const bonDate = getCurrentDateTime();
+
+            let storeName = "Unknown_Store";
+            store.forEach((name) => {
+                storeName = name.storname;
+            });
+
+            const pdfFileName = `bon-de-livraison-${storeName}-${bonDate}.pdf`;
+            const bonNumber = generateBonNumber();
+            const totalPages = Math.ceil(ordersData.length / maxRowsPerPage);
+
+            for (let pageNum = 0; pageNum < totalPages; pageNum++) {
+                if (pageNum > 0) {
+                    doc.addPage();
+                }
+
+                // Create a temporary page container with proper A4 dimensions
+                const pageContainer = document.createElement('div');
+                pageContainer.className = 'page-container';
+                pageContainer.style.position = 'absolute';
+                pageContainer.style.left = '-9999px';
+                document.body.appendChild(pageContainer);
+
+                // Create content wrapper
+                const contentWrapper = document.createElement('div');
+                contentWrapper.style.flex = '1';
+                contentWrapper.style.display = 'flex';
+                contentWrapper.style.flexDirection = 'column';
+
+                // Add header
+                const header = createHeader(storeName, bonNumber, bonDate);
+                contentWrapper.appendChild(header);
+
+                // Add table
+                const tableContainer = document.createElement('div');
+                tableContainer.className = 'dive2';
+                const pageData = ordersData.slice(pageNum * maxRowsPerPage, (pageNum + 1) * maxRowsPerPage);
+                const table = createTable(pageData);
+
+                // Adjust table styles for PDF
+                table.style.marginTop = '2rem';
+                table.style.marginBottom = '20px';
+                tableContainer.appendChild(table);
+                contentWrapper.appendChild(tableContainer);
+
+                // Add spacer
+                const spacer = document.createElement('div');
+                spacer.style.flex = '1';
+                contentWrapper.appendChild(spacer);
+
+                // Add footer
+                const footer = document.createElement('div');
+                footer.className = 'dive3';
+                footer.innerHTML = `
+                    <p style="text-decoration: underline;">Ste ZAGORA HERBES VIP SARL Adresse : DOUAR OLD MOUSSA SIDI TAIBI, KÉNITRA</p>
+                    <p style="text-decoration: underline;">IF: 20760384  RC: 81163 à SIDI TAIBI TEL: 06.61.17.10.05  ICE: 001899662000010</p>
+                `;
+                contentWrapper.appendChild(footer);
+
+                // Add content wrapper to page container
+                pageContainer.appendChild(contentWrapper);
+
+                // Convert to canvas with proper scaling
+                const canvas = await html2canvas(pageContainer, { 
+                    scale: 2,
+                    useCORS: true,
+                    height: pageContainer.offsetHeight,
+                    width: pageContainer.offsetWidth,
+                    backgroundColor: 'white'
+                });
+
+                const imgData = canvas.toDataURL('image/png');
+
+                // Calculate dimensions to fit A4
+                const imgWidth = 210; // A4 width in mm
+                const imgHeight = 297; // A4 height in mm
+
+                // Add image to PDF with full page dimensions
+                doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+
+                // Clean up
+                document.body.removeChild(pageContainer);
+            }
+
+            // Convert the PDF to a buffer (binary data)
+            const pdfBuffer = doc.output('arraybuffer');
+
+            // Function to format the date as DD-MM-YYYY HH:mm:ss
+            function formatDate(date) {
+                const d = new Date(date);
+                const day = String(d.getDate()).padStart(2, '0');
+                const month = String(d.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+                const year = d.getFullYear();
+                const hours = String(d.getHours()).padStart(2, '0');
+                const minutes = String(d.getMinutes()).padStart(2, '0');
+                const seconds = String(d.getSeconds()).padStart(2, '0');
+            
+                return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+            }
+
+            // Use this function to format the date before sending
+            const formattedDate = formatDate(new Date());
+            
+            // Prepare the data to send to the server
+            const formData = new FormData();
+            formData.append('store', storeName);
+            formData.append('date', formattedDate); // Format the date as DD-MM-YYYY HH:mm:ss
+            formData.append('file', new Blob([pdfBuffer], { type: 'application/pdf' }), pdfFileName); // Send the file as PDF
+
+            // Send the data to the server
+            fetch('http://localhost:3000/save-invoice', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Invoice saved successfully:', data);
+            })
+            .catch(error => {
+                console.error('Error saving invoice:', error);
+            });
+
+            
+                doc.save(pdfFileName);
+        }
+
+        // Initialize the page content
+        document.addEventListener("DOMContentLoaded", function () {
+            const ordersData = JSON.parse(localStorage.getItem("ordersData")) || [];
+            const store = JSON.parse(localStorage.getItem("store")) || [];
+            const maxRowsPerTable = 24;
+            const bonContainerWrapper = document.body;
+
+            function createBonContainer(storeName) {
+                const bonContainer = document.createElement("div");
+                bonContainer.classList.add("bon-container");
+
+                const bonNumber = generateBonNumber();
+                const bonDate = getCurrentDateTime();
+                const storeDetail = storeDetails[storeName] || storeDetails["Default"];
+
+                const header = createHeader(storeName, bonNumber, bonDate);
+                bonContainer.appendChild(header);
+
+                const tableContainer = document.createElement("div");
+                tableContainer.classList.add("dive2");
+                const table = document.createElement("table");
+                table.innerHTML = `
+                    <thead>
+                        <tr>
+                            <th>Serie</th>
+                            <th>Produit</th>
+                            <th>Quantité</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="orders-list"></tbody>
+                `;
+
+                tableContainer.appendChild(table);
+                bonContainer.appendChild(tableContainer);
+                bonContainerWrapper.appendChild(bonContainer);
+
+                return table.querySelector(".orders-list");
+            }
+
+            const tableBody = createBonContainer(store[0]?.storname);
+
+            ordersData.forEach((order, index) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${order.serie}</td>
+                    <td>${order.produit}</td>
+                    <td>${order.quantite}</td>
+                    <td>${order.status}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        });
+
+        // Event listener for the upload button
+        document.getElementById('Upload').addEventListener('click', generatePDF);
+    </script>
+</body>
+</html>

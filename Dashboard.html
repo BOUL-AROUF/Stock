@@ -1,0 +1,184 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
+    <script src="https://kit.fontawesome.com/7ce4c17c5c.js" crossorigin="anonymous"></script>
+    <link rel="shortcut icon" href="/logo.png" type="image/x-icon">
+    <title>Dashboard</title>
+    <style>
+
+    </style>
+</head>
+<body>
+    <header>
+        <img src="./Untitled-1-01.png" alt="Image" class="logo" class="active">
+        <div class="menu">
+            <ul>
+                <li class="active" id="dash">
+                    Dashboard
+                </li>
+                <li id="ord">
+                    Orders
+                </li>
+                <li id="inv">
+                    Invoices
+                </li>
+            </ul>
+        </div>
+    </header>
+    <div class="container">
+        <div class="head">
+            <h2>BIO ZAGORA STOCK TRACKER</h2>
+            <span class="exit" id="logout-btn"><i class="fa-solid fa-door-open"></i></span>
+        </div>
+        <div class="Date-time">
+            <h2 id="current-time">00:00:00</h2>
+            <h2 id="current-day">Day</h2> 
+            <h2 id="current-date">dd.mm.yyyy</h2>
+        </div>
+        <div class="tables">
+            <table class="ste">
+                <thead>
+                    <tr>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    <table class="orders-table">
+                        <thead>
+
+                        </thead>
+                        <tbody id="orders">
+ 
+                        </tbody>
+                    </table>
+                </tbody>
+            </table>    
+        </div>
+        
+    </div>
+<script>
+
+    let Dash = document.getElementById('dash');
+    let ord = document.getElementById('ord');
+
+    ord.onclick = function() {
+        window.location.href = 'orders.html';
+    }
+    inv.onclick = function() {
+        window.location.href = 'invoices.html';
+    }
+
+
+document.getElementById('logout-btn').addEventListener('click', async () => {
+    try {
+        const response = await fetch('http://localhost:3000/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'same-origin',  // Keep session intact if needed
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            // Redirect to login page after successful logout
+            window.location.href = 'index.html';  // Change to your login page
+        } else {
+            console.error('Logout failed:', data.error);
+        }
+    } catch (error) {
+        console.error('Error logging out:', error);
+    }
+});
+
+function updateDateTime() {
+    const now = new Date()
+    // Format Time: HH:MM:SS
+    const hours = now.getHours().toString().padStart(2, "0");
+    const minutes = now.getMinutes().toString().padStart(2, "0");
+    const seconds = now.getSeconds().toString().padStart(2, "0");
+    const formattedTime = `${hours}:${minutes}:${seconds}`; 
+    // Format Date: DD.MM.YYYY
+    const day = now.getDate().toString().padStart(2, "0");
+    const months = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+    const month = months[now.getMonth()]; // Get month name in French
+    const year = now.getFullYear();
+    const formattedDate = `${day} ${month} ${year}`;    
+    // Get Day Name in French
+    const daysOfWeek = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+    const dayName = daysOfWeek[now.getDay()];   
+    // Update HTML
+    document.getElementById("current-time").textContent = formattedTime;
+    document.getElementById("current-date").textContent = formattedDate;
+    document.getElementById("current-day").textContent = dayName;
+}
+// Update every second
+setInterval(updateDateTime, 1000)
+// Run immediately when the page loads
+updateDateTime();
+
+function loadOrders() {
+    fetch('http://localhost:3000/get-orders')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const ordersContainer = document.querySelector('.tables');
+                ordersContainer.innerHTML = '';
+
+                const stores = ['Rabat', 'Tanger', 'Salé', 'Kénitra', 'Laayoune'];
+
+                stores.forEach(store => {
+                    if (data.orders[store] && data.orders[store].length > 0) {
+                        // Create store table structure
+                        const storeTable = document.createElement('table');
+                        storeTable.className = 'ste';
+                        storeTable.innerHTML = `
+                            <thead>
+                                <tr><th class="store-name">${store}</th></tr>
+                            </thead>
+                            <tbody>
+                                <table class="orders-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Serie</th>
+                                            <th>Produit</th>
+                                            <th>Quantité</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class ="orders" id="orders-${store}"></tbody>
+                                </table>
+                            </tbody>
+                        `;
+
+                        ordersContainer.appendChild(storeTable);
+
+                        // Populate orders for this store
+                        const ordersBody = document.getElementById(`orders-${store}`);
+                        data.orders[store].forEach(order => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${order.serie}</td>
+                                <td>${order.produit}</td>
+                                <td>${order.quantite}</td>
+                                <td>${order.date}</td>
+                            `;
+                            ordersBody.appendChild(row);
+                        });
+                    }
+                });
+            } else {
+                console.error('Failed to fetch orders:', data.message);
+            }
+        })
+        .catch(error => console.error('Error fetching orders:', error));
+}
+
+document.addEventListener('DOMContentLoaded', loadOrders);
+
+</script>
+</body>
+</html>
