@@ -9,9 +9,14 @@ const path = require('path');
 const multer = require('multer');
 const upload = multer({storage: multer.memoryStorage(),});
 
-app.use(cors({
-  origin: 'https://stock.biozagora.com'
-}));
+app.use(cors({ origin: "https://stock.biozagora.com", credentials: true }));
+
+app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "https://stock.biozagora.com");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    next();
+});
 const pool = mysql.createPool({
   host: 'blb7dojcqkcztbntoks9-mysql.services.clever-cloud.com',
   user: 'u8zdpw1qpnddy38e', // The MySQL user you created
