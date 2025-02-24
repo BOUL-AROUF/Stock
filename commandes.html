@@ -236,7 +236,7 @@
                 }
 
                 try {
-                    const response = await fetch(`http://localhost:3000/user-orders?store=${store}&date=${formattedDate}`);
+                    const response = await fetch(`https://stock-gjz71z0le-boularoufs-projects.vercel.app/user-orders?store=${store}&date=${formattedDate}`);
                     if (!response.ok) {
                         throw new Error('Failed to fetch orders');
                     }
