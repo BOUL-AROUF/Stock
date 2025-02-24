@@ -10,7 +10,7 @@ const multer = require('multer');
 const upload = multer({storage: multer.memoryStorage(),});
 
 app.use(cors({
-  origin: 'https://stock-gjz71z0le-boularoufs-projects.vercel.app'
+  origin: 'https://stock.biozagora.com'
 }));
 const pool = mysql.createPool({
   host: 'blb7dojcqkcztbntoks9-mysql.services.clever-cloud.com',
