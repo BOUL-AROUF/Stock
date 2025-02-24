@@ -241,7 +241,7 @@
                 return;
             }
 
-            fetch('http://localhost:3000/save-orders', {
+            fetch('https://stock-gjz71z0le-boularoufs-projects.vercel.app/save-orders', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -269,7 +269,7 @@
             const produitInput = document.getElementById("itemName");
 
             if (barcode.length > 0) {
-                fetch(`http://localhost:3000/get-article?barcode=${barcode}`)
+                fetch(`https://stock-gjz71z0le-boularoufs-projects.vercel.app/get-article?barcode=${barcode}`)
                     .then(response => response.json())
                     .then(data => {
                         produitInput.value = data.article || ""; // Auto-fill produit if found
