@@ -14,16 +14,16 @@ const excel = require('exceljs');
 
 // Middleware
 app.use(cors({
-    origin: ('http://localhost:3000','https://expressed-east-magnificent-whom.trycloudflare.com/'),
+    origin: ('https://stock.biozagora.com'),
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
 }));
 
 
 const pool = mysql.createPool({
-    host: "31.170.164.153",
-    user: "u764605078_root",
+    host: "biozagora.ddns.net",
+    user: "oth",
     password: "AbBa@2002####",
-    database: "u764605078_railway",
+    database: "Biozagora_Stock",
     port: 3306,
     waitForConnections: true,
     connectionLimit: 10,           // Reduced from 15 to 10 for stability
